@@ -64,12 +64,10 @@ if BC == 0
 elseif BC == 1
 
   % Grid and initial conditions:
-  N = 16; nu = .01; a = -1; b = 1; L = b - a; 
-  x = cos(pi*(0:N)/N); Jacobian = 2/L;
-  %b = x<=0;
-  %u0 = zeros(1,N+1); u0(b) = -sin(pi*x(b)); 
-  %u0 = exp(-8*x.^2); 
-  u0 = 2*x; 
+  N = 64; nu = .01; a = -1; b = 1; L = b - a; 
+  x = cos(pi*(0:N)/N); Jacobian = 2/L; 
+  %u0 = 2*x; 
+  u0 = cos(x);
   alpha = u0(1); beta = u0(end);
   tmax = .5; 
   timeStepping = ['Euler';'RK4  ']; 

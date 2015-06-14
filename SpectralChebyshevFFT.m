@@ -24,6 +24,14 @@
 % 
 %           This problem has analytical solution u(x,t) = 2x/(1+2t) 
 %
+% MMS Test problem for Chebyshev spectral collocation method: 
+%   
+%           u(x,t) = cos(x)exp(-2 nu t)
+%           Initial condition u(x,0) = u0 = cos(x) 
+%           
+%           Dirichlet BC u(-1,t) = cos(-1)exp(-2 nu t) and 
+%           u(1,t) = cos(1)exp(-2 nu t)
+%           
 %-------------------ooooooooo----------------------------------------------
 
 function [tdata,udata] = SpectralChebyshevFFT(N,a,b,nu,x0, u0,tmax, str, BC, gminus, gplus,jacobian)
@@ -82,7 +90,7 @@ function [tdata,udata] = SpectralChebyshevFFT(N,a,b,nu,x0, u0,tmax, str, BC, gmi
             t = n*dt;
             v1 = v; v0 = v;
             for rk = 1:4
-                du = computeRHS(v,nu,jacobian, BC);
+                du = computeRHS(v,nu,jacobian,BC,x,t);
                 if rk < 4
                     v = v0; v = v + b(rk)*du;
                 end
@@ -92,10 +100,10 @@ function [tdata,udata] = SpectralChebyshevFFT(N,a,b,nu,x0, u0,tmax, str, BC, gmi
             % Impose Dirichlet BC:
             if strcmp(BC,BC1) == 1
                 % General Dirichlet BC:
-                %v(1) = gplus; v(end) = gminus;
+                v(1) = gplus*exp(-2*nu*t); v(end) = gminus*exp(-2*nu*t);
                 % BC for the test problem: 
-                g = 2./(1+2*t);
-                v(1) = g; v(end) = -g;
+                %g = 2./(1+2*t);
+                %v(1) = g; v(end) = -g;
             end
             if mod(n,nplt) == 0 
                 i = floor(n/nplt);
@@ -103,14 +111,14 @@ function [tdata,udata] = SpectralChebyshevFFT(N,a,b,nu,x0, u0,tmax, str, BC, gmi
             end
         end
         clf, drawnow, set(gcf,'renderer','zbuffer');
-        [X,T] = meshgrid(xi,tdata);
+        [X,T] = meshgrid(x,tdata);
         
         mesh(X,T,udata)
         xlabel x, ylabel t, zlabel u
 
         % Plot the analytical solution:
         figure(2);
-        Z = (2*X)./(1+2*T);
+        Z = cos(X).*exp(-2*nu*T);%(2*X)./(1+2*T);
         mesh(X, T, Z)
         xlabel x, ylabel t, zlabel exact   
         
