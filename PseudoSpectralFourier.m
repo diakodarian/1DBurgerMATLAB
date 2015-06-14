@@ -30,6 +30,7 @@
 
 function [tdata,udata] = PseudoSpectralFourier(N,L,nu,x0, u0,tmax)
 
+
 % Set up grid and initial data:
   dt = 0.0005;%.1/N^2;
   h = 2*pi/N; x = x0;
@@ -55,26 +56,27 @@ function [tdata,udata] = PseudoSpectralFourier(N,L,nu,x0, u0,tmax)
     c = g.*fft(real( ifft(E.*v + b/2) ).^2);     % Runge-Kutta
     d = g.*fft(real( ifft(E2.*v+E.*c) ).^2);
     v = E2.*v + (E2.*a + 2*E.*(b+c) + d)/6;
-    v(dealias) = 0;
+    %v(dealias) = 0;
     if mod(n,nplt) == 0 
       u = real(ifft(v)); waitbar(n/nmax)
       i = floor(n/nplt);
       udata(i+1,:) = u; tdata(i+1) = t;
     end
   end
-  waterfall(x,tdata,udata), xlabel x, ylabel t, zlabel u
+  %waterfall(x,tdata,udata), xlabel x, ylabel t, zlabel u
   %waterfall(x,tdata,udata), colormap default; view(-20,25)
-  xlabel x, ylabel t, zlabel u%, axis([-L+h L 0 tmax -1.1 1.1]), grid off
-%   udata(1, N/2)
-%   udata(end, N/2)
-%   figure;
-%   [X,T] = meshgrid(x,tdata);
-%   Z = (2*X)./(1+2*T);
-%   surf(X, T, Z)
-%   xlabel x, ylabel t, zlabel Z
-%   error = zeros(8,N); 
-%   for i = 1:8
-%     error(i,:) = abs(Z(i,:)-udata(i,:));
-%   end
-%   figure(3);
-%   surf(x,tdata,error)
+  %xlabel x, ylabel t, zlabel u%, axis([-L+h L 0 tmax -1.1 1.1]), grid off
+  %udata(1, N/2)
+  %udata(end, N/2)
+  %figure;
+  [X,T] = meshgrid(x,tdata);
+  %Z = (2*X)./(1+2*T);
+  surf(X, T, udata)
+  xlabel x, ylabel t, zlabel Z
+  %error = zeros(8,N); 
+  %for i = 1:8
+  %  error(i,:) = abs(Z(i,:)-udata(i,:));
+  %end
+  %figure(3);
+  %surf(x,tdata,error)
+

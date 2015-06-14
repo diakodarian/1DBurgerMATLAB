@@ -48,13 +48,15 @@ BC = 1;
 if BC == 0
 
  % Grid and initial conditions:
-  N = 128; nu = 1; R = 20;%L = 1; 
-  h = 2*pi/N; x = h*(1:N); %x = L*(x-pi)/pi;
+  N = 128; nu = 0.01; L = pi; 
+  h = 2*pi/N; x = h*(1:N);
+  %x = L*(x-pi)/pi;
   %u0 = sin((x-L)/L*pi); 
   %u0 = exp(-4*x.^2);
-  u0 =  -R*sin(x);
-  tmax = 0.1; 
-  PseudoSpectralFourier(N,L,nu,x,u0,tmax)
+  u0 = sin(x);
+  tmax = 1.0; 
+  %PseudoSpectralFourier(N,L,nu,x,u0,tmax); % With integrating factor
+  PseudoSpectralFourierGalerkin(N,L,nu,x,u0,tmax)
  
 %--------------------------------------------------------------------------
 %                  Chebyshev Spectral Collocation Method
@@ -62,7 +64,7 @@ if BC == 0
 elseif BC == 1
 
   % Grid and initial conditions:
-  N = 100; nu = .01; a = -1; b = 1; L = b - a; 
+  N = 16; nu = .01; a = -1; b = 1; L = b - a; 
   x = cos(pi*(0:N)/N); Jacobian = 2/L;
   %b = x<=0;
   %u0 = zeros(1,N+1); u0(b) = -sin(pi*x(b)); 

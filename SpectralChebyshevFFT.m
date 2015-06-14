@@ -13,7 +13,16 @@
 % Date:     10.07.2015
 % 
 % 
+%
+%     --------------oooooo---------------------
+%
+% Test problem for Chebyshev spectral collocation method: 
+%   
+%           Initial condition u(x,0) = u0 = 2x 
+%           
+%           Dirichlet BC u(-1,t) = -2/(1+2t) and u(1,t) = 2/(1+2t)
 % 
+%           This problem has analytical solution u(x,t) = 2x/(1+2t) 
 %
 %-------------------ooooooooo----------------------------------------------
 
@@ -26,11 +35,12 @@ function [tdata,udata] = SpectralChebyshevFFT(N,a,b,nu,x0, u0,tmax, str, BC, gmi
     xi = .5*b*(1+x) + .5*a*(1-x);
 % Time-stepping by leap frog formula:
     clf, drawnow, set(gcf,'renderer','zbuffer')
-    nplt = floor((tmax/7)/dt); nmax = round(tmax/dt);
+    nplots = 7; % Number of plots in time
+    nplt = floor((tmax/nplots)/dt); nmax = round(tmax/dt);
 
-% Initial condition and wave number vector:
+% Initial condition:
     v = u0; vold = u0; t = 0;
-    udata = zeros(8,N+1); tdata = zeros(1,8);
+    udata = zeros(nplots+1,N+1); tdata = zeros(1,nplots+1);
     udata(1,:) = v; tdata(1) = t;
 
 %--------------------------------------------------------------------------
@@ -63,10 +73,10 @@ function [tdata,udata] = SpectralChebyshevFFT(N,a,b,nu,x0, u0,tmax, str, BC, gmi
 %           Time-stepping using RK4 method with Dirichlet BC
 %--------------------------------------------------------------------------
     elseif strcmp(str,s2) == 1
-        h = dt;                                        % step size
+        
         % RK4 parameters:
-        a = [1/6 1/3 1/3 1/6]*h;
-        b = [.5 .5 1]*h;
+        a = [1/6 1/3 1/3 1/6]*dt;
+        b = [.5 .5 1]*dt;
         
         for n = 1:nmax              % calculation loop
             t = n*dt;
@@ -85,32 +95,30 @@ function [tdata,udata] = SpectralChebyshevFFT(N,a,b,nu,x0, u0,tmax, str, BC, gmi
                 %v(1) = gplus; v(end) = gminus;
                 % BC for the test problem: 
                 g = 2./(1+2*t);
-                v(1) = g; v(end)=-g;
+                v(1) = g; v(end) = -g;
             end
             if mod(n,nplt) == 0 
                 i = floor(n/nplt);
                 udata(i+1,:) = v; tdata(i+1) = t;
             end
         end
-        surf(xi,tdata,udata)%waterfall(x,tdata,udata)
-        %axis([-1 1 0 tmax -1.1 1.1]),
-        xlabel x, ylabel t, zlabel u
-        udata(1, (N)/2)
-        udata(end, (N)/2)
-        % Plot the analytical solution:
-        figure;
+        clf, drawnow, set(gcf,'renderer','zbuffer');
         [X,T] = meshgrid(xi,tdata);
+        
+        mesh(X,T,udata)
+        xlabel x, ylabel t, zlabel u
+
+        % Plot the analytical solution:
+        figure(2);
         Z = (2*X)./(1+2*T);
-        surf(X, T, Z)
-        xlabel x, ylabel t, zlabel Z   
-        Z(1, (N)/2)
-        Z(end, (N)/2)
-        error = zeros(8,N+1); 
-        for i = 1:8
-            error(i,:) = abs(Z(i,:)-udata(i,:));
-        end
+        mesh(X, T, Z)
+        xlabel x, ylabel t, zlabel exact   
+        
+        
         figure(3);
-        surf(xi,tdata,error)
+        error = Z-udata; 
+        mesh(X,T,error)
+        xlabel x, ylabel t, zlabel error 
     end
     
                                 
